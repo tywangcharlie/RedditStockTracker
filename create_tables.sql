@@ -13,6 +13,8 @@ CREATE TABLE mention (
     stock_id INTEGER,
     dt TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     message TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    num_comments INTEGER NOT NULL,
     source TEXT NOT NULL,
     url TEXT NOT NULL,
     PRIMARY KEY (stock_id, dt),
