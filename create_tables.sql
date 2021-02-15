@@ -1,11 +1,12 @@
-CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
+-- CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
 
 CREATE TABLE stock (
     id SERIAL PRIMARY KEY,
     symbol TEXT NOT NULL,
     name TEXT NOT NULL,
     exchange TEXT NOT NULL,
-    is_etf BOOLEAN NOT NULL
+    is_etf BOOLEAN NOT NULL,
+    UNIQUE (symbol)
 );
 
 CREATE TABLE mention (
@@ -19,7 +20,7 @@ CREATE TABLE mention (
 );
 
 CREATE INDEX ON mention (stock_id, dt DESC);
-SELECT create_hypertable('mention', 'dt');
+-- SELECT create_hypertable('mention', 'dt');
 
 CREATE TABLE etf_holding (
     etf_id INTEGER NOT NULL,
@@ -46,4 +47,4 @@ CREATE TABLE stock_price (
 
 CREATE INDEX ON stock_price (stock_id, dt DESC);
 
-SELECT create_hypertable('stock_price', 'dt');
+-- SELECT create_hypertable('stock_price', 'dt');
