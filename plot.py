@@ -9,7 +9,7 @@ import json
 connection = psycopg2.connect(host=DBConfig.DB_HOST, database=DBConfig.DB_NAME, user=DBConfig.DB_USER, password=DBConfig.DB_PASS)
 cursor = connection.cursor()
 
-filter_dict = ['A', 'HOLD', 'ARE', 'BUY', 'BE', 'FOR', 'ON', 'ALL', 'IT', 'DD', 'JUST', 'CAN', 'SO', 'AT', 'YOLO', 'MOON', 'CEO', 'GOOD', 'NEW', 'LOW']
+filter_dict = ['A', 'HOLD', 'ARE', 'BUY', 'BE', 'FOR', 'ON', 'ALL', 'IT', 'DD', 'JUST', 'CAN', 'SO', 'AT', 'YOLO', 'MOON', 'CEO', 'GOOD', 'NEW', 'LOW', 'IPO', 'RH', 'USA', 'OR', 'EV', 'DOG', 'ONE', 'GDP', 'BIG', 'E', 'AM']
 
 def showTickerTrend(ticker='GME', time_bucket='day', date_start = '2021-01-15', date_end = date.today()):
     cursor.execute("""
@@ -43,6 +43,6 @@ def showTickerRank(date_start = '2021-01-15', date_end = date.today(), limit = 5
     print(df[:50])
     return df
 
-showTickerTrend(ticker='TLRY')
-showTickerRank(date_start = '2021-02-14')
+showTickerTrend(ticker='API', date_start = '2021-01-01')
+showTickerRank(date_start = '2021-02-08')
 

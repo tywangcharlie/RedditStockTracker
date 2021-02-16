@@ -11,24 +11,25 @@ with open('./TickerDict.json','r') as file:
     ticker_dict=json.loads(file.read())
 
 connection = psycopg2.connect(host=DBConfig.DB_HOST, database=DBConfig.DB_NAME, user=DBConfig.DB_USER, password=DBConfig.DB_PASS)
+
+# Get stock dict from db
 cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 cursor.execute("""
     SELECT * FROM stock
 """)
 rows = cursor.fetchall()
-
 stocks = {}
 for row in rows:
     stocks[row['symbol']] = row['id']
 
-
+# Prepare Reddit API
 api = PushshiftAPI()
 start_time = int(datetime.datetime(2021, 1, 1).timestamp())
 
+#Fetch submission
 submissions = api.search_submissions(after=start_time,
                                      subreddit='wallstreetbets',
                                      filter=['url','author', 'title', 'subreddit', 'score', 'selftext', 'num_comments'])
-
 for submission in submissions:
     words = submission.title.split()
     try:
@@ -49,7 +50,7 @@ for submission in submissions:
                     cursor.execute("""
                                         INSERT INTO mention (dt, stock_id, message, score, num_comments, source, url)
                                         VALUES (%s, %s, %s, %s, %s, 'wallstreetbets', %s)
-                                        ON CONFLICT (dt, stock_id)
+                                        ON CONFLICT (dt, stock_id, message)
                                         DO UPDATE SET (score, num_comments) = (EXCLUDED.score, EXCLUDED.num_comments)
                                     """, (submitted_time, stocks[ticker], submission.title, submission.score, submission.num_comments, submission.url))
 
@@ -58,8 +59,4 @@ for submission in submissions:
                     print(e)
                     connection.rollback()
 
-
-# select count(*) as num_mentions, stock_id, symbol
-# from mention join stock on stock.id = mention.stock_id
-# group by stock_id, symbol
-# order by num_mentions DESC;
+# TODO: Fetch Comments, Fetch Twitter, Functionalize, Deploy

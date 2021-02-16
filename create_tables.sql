@@ -1,4 +1,10 @@
--- CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
+-- SELECT pg_catalog.set_config('search_path', '', false);
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO tywang;
+GRANT ALL ON SCHEMA public TO postgres;
+
+CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;
 
 CREATE TABLE stock (
     id SERIAL PRIMARY KEY,
@@ -17,7 +23,7 @@ CREATE TABLE mention (
     num_comments INTEGER NOT NULL,
     source TEXT NOT NULL,
     url TEXT NOT NULL,
-    PRIMARY KEY (stock_id, dt),
+    PRIMARY KEY (stock_id, dt, message),
     CONSTRAINT fk_mention_stock FOREIGN KEY (stock_id) REFERENCES stock (id)
 );
 
