@@ -43,6 +43,6 @@ def showTickerRank(date_start = '2021-01-15', date_end = date.today(), limit = 5
     print(df[:50])
     return df
 
-showTickerTrend(ticker='API', date_start = '2021-01-01')
-showTickerRank(date_start = '2021-02-08')
+showTickerTrend(ticker='GME', date_start = '2021-01-01')
+showTickerRank(date_start = '2021-01-01')
 

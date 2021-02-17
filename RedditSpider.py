@@ -1,5 +1,6 @@
 from psaw import PushshiftAPI
 import datetime
+from datetime import timezone
 import alpaca_trade_api as tradeapi
 import psycopg2
 import psycopg2.extras
@@ -24,39 +25,49 @@ for row in rows:
 
 # Prepare Reddit API
 api = PushshiftAPI()
-start_time = int(datetime.datetime(2021, 1, 1).timestamp())
 
-#Fetch submission
-submissions = api.search_submissions(after=start_time,
-                                     subreddit='wallstreetbets',
-                                     filter=['url','author', 'title', 'subreddit', 'score', 'selftext', 'num_comments'])
-for submission in submissions:
-    words = submission.title.split()
-    try:
-        content_words = submission.selftext.split()
-    except AttributeError:
-        content_words = []
-    tickers_detected = list(set(filter(lambda word: word in ticker_dict.keys(), words+content_words)))
-    # cashtags = list(set(filter(lambda word: word.lower().startswith('$'), words)))
-    if len(tickers_detected) > 0:
-        print(tickers_detected)
-        print(submission.title)
+def submissions_scrape():
 
-        for ticker in tickers_detected:
-            if ticker in stocks:
-                submitted_time = datetime.datetime.fromtimestamp(submission.created_utc).isoformat()
+    # start_time = int(datetime.datetime(2021, 1, 1).timestamp())
+    start_time = int((datetime.datetime.today()-datetime.timedelta(days=30)).timestamp())
+    #Fetch submission
+    submissions = api.search_submissions(after=start_time,
+                                         subreddit='wallstreetbets',
+                                         filter=['url','author', 'title', 'subreddit', 'score', 'selftext', 'num_comments'])
+    for submission in submissions:
+        words = submission.title.split()
+        try:
+            content_words = submission.selftext.split()
+        except AttributeError:
+            content_words = []
+        tickers_detected = list(set(filter(lambda word: word in ticker_dict.keys(), words+content_words)))
+        # cashtags = list(set(filter(lambda word: word.lower().startswith('$'), words)))
+        if len(tickers_detected) > 0:
+            print(tickers_detected)
+            print(submission.title)
 
-                try:
-                    cursor.execute("""
-                                        INSERT INTO mention (dt, stock_id, message, score, num_comments, source, url)
-                                        VALUES (%s, %s, %s, %s, %s, 'wallstreetbets', %s)
-                                        ON CONFLICT (dt, stock_id, message)
-                                        DO UPDATE SET (score, num_comments) = (EXCLUDED.score, EXCLUDED.num_comments)
-                                    """, (submitted_time, stocks[ticker], submission.title, submission.score, submission.num_comments, submission.url))
+            for ticker in tickers_detected:
+                if ticker in stocks:
+                    submitted_time = datetime.datetime.fromtimestamp(submission.created_utc, tz=timezone.utc).isoformat()
 
-                    connection.commit()
-                except Exception as e:
-                    print(e)
-                    connection.rollback()
+                    try:
+                        cursor.execute("""
+                                            INSERT INTO mention (dt, stock_id, message, score, num_comments, source, url)
+                                            VALUES (%s, %s, %s, %s, %s, 'wallstreetbets', %s)
+                                            ON CONFLICT (dt, stock_id, message)
+                                            DO UPDATE SET (score, num_comments) = (EXCLUDED.score, EXCLUDED.num_comments)
+                                        """, (submitted_time, stocks[ticker], submission.title, submission.score, submission.num_comments, submission.url))
+
+                        connection.commit()
+                    except Exception as e:
+                        print(e)
+                        connection.rollback()
+
+while True:
+    submissions_scrape_start_time = datetime.datetime.now()
+    submissions_scrape()
+    submissions_scrape_end_time = datetime.datetime.now()
+    time_diff = submissions_scrape_end_time - submissions_scrape_start_time
+    print("Scraping submissions took {} minutes".format(time_diff.min))
 
 # TODO: Fetch Comments, Fetch Twitter, Functionalize, Deploy
