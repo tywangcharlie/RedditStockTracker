@@ -1,12 +1,12 @@
 import psycopg2
 from datetime import date
 import psycopg2.extras
-import DBConfig, BrokerConfig
+import config
 import pandas as pd
 import matplotlib.pyplot as plt
 import json
 
-connection = psycopg2.connect(host=DBConfig.DB_HOST, database=DBConfig.DB_NAME, user=DBConfig.DB_USER, password=DBConfig.DB_PASS)
+connection = psycopg2.connect(host=config.DB_HOST, database=config.DB_NAME, user=config.DB_USER, password=config.DB_PASS)
 cursor = connection.cursor()
 
 filter_dict = ['A', 'HOLD', 'ARE', 'BUY', 'BE', 'FOR', 'ON', 'ALL', 'IT', 'DD', 'JUST', 'CAN', 'SO', 'AT', 'YOLO', 'MOON', 'CEO', 'GOOD', 'NEW', 'LOW', 'IPO', 'RH', 'USA', 'OR', 'EV', 'DOG', 'ONE', 'GDP', 'BIG', 'E', 'AM']

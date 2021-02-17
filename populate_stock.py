@@ -1,4 +1,4 @@
-import DBConfig, BrokerConfig
+import config, config
 import alpaca_trade_api as tradeapi
 import json
 import datetime
@@ -7,10 +7,10 @@ import psycopg2.extras
 
 populate_stock_start_time = datetime.datetime.utcnow()
 
-connection = psycopg2.connect(host=DBConfig.DB_HOST, database=DBConfig.DB_NAME, user=DBConfig.DB_USER, password=DBConfig.DB_PASS)
+connection = psycopg2.connect(host=config.DB_HOST, database=config.DB_NAME, user=config.DB_USER, password=config.DB_PASS)
 cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
-api = tradeapi.REST(BrokerConfig.API_KEY, BrokerConfig.API_SECRET, base_url=BrokerConfig.API_URL)
+api = tradeapi.REST(config.ALPACA_API_KEY, config.ALPACA_API_SECRET, base_url=config.ALPACA_API_URL)
 assets = api.list_assets()
 
 ticker_dict = {}

@@ -5,13 +5,13 @@ import alpaca_trade_api as tradeapi
 import psycopg2
 import psycopg2.extras
 # https://stackoverflow.com/questions/60160359/error-code-when-installing-psycopg2-in-requirements-txt-in-django
-import DBConfig, BrokerConfig
+import config
 import json
 
 with open('./TickerDict.json','r') as file:
     ticker_dict=json.loads(file.read())
 
-connection = psycopg2.connect(host=DBConfig.DB_HOST, database=DBConfig.DB_NAME, user=DBConfig.DB_USER, password=DBConfig.DB_PASS)
+connection = psycopg2.connect(host=config.DB_HOST, database=config.DB_NAME, user=config.DB_USER, password=config.DB_PASS)
 
 # Get stock dict from db
 cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
